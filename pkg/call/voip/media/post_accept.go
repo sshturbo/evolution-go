@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	call_state "github.com/evolution-foundation/evolution-go/pkg/call/voip/call"
 	"github.com/evolution-foundation/evolution-go/pkg/call/voip/core"
 	"github.com/evolution-foundation/evolution-go/pkg/call/voip/signaling"
 	"github.com/evolution-foundation/evolution-go/pkg/call/voip/wa"
@@ -35,12 +34,18 @@ func (s *relaySession) sendOutgoingPostAccept(callID string) {
 
 	peer, err := types.ParseJID(state.PeerJID)
 	if err != nil || peer.IsEmpty() {
-		s.log.Warn("WhatsApp post-accept signaling skipped", "instance", s.instanceID, "call_id", callID, "err", fmt.Errorf("invalid peer JID: %w", err))
+		if err == nil {
+			err = fmt.Errorf("peer JID is empty")
+		}
+		s.log.Warn("WhatsApp post-accept signaling skipped", "instance", s.instanceID, "call_id", callID, "err", err)
 		return
 	}
 	creator, err := types.ParseJID(state.CallCreator)
 	if err != nil || creator.IsEmpty() {
-		s.log.Warn("WhatsApp post-accept signaling skipped", "instance", s.instanceID, "call_id", callID, "err", fmt.Errorf("invalid creator JID: %w", err))
+		if err == nil {
+			err = fmt.Errorf("creator JID is empty")
+		}
+		s.log.Warn("WhatsApp post-accept signaling skipped", "instance", s.instanceID, "call_id", callID, "err", err)
 		return
 	}
 
@@ -59,5 +64,3 @@ func (s *relaySession) sendOutgoingPostAccept(callID string) {
 	}
 	s.log.Info("WhatsApp post-accept media signaling sent", "instance", s.instanceID, "call_id", callID, "peer", peer.String())
 }
-
-var _ = (*call_state.Info)(nil)
