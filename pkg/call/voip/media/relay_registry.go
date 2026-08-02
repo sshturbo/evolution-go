@@ -90,6 +90,7 @@ func (s *relaySession) handleEvent(rawEvent interface{}) {
 	case *events.CallAccept:
 		_ = s.source.EnsureRemoteAccepted(s.instanceID, event.CallID)
 		s.source.CaptureRelayNode(s.instanceID, event.CallID, event.Data)
+		go s.sendOutgoingPostAccept(event.CallID)
 		go s.startLogged(event.CallID)
 	case *events.CallTransport:
 		s.source.CaptureRelayNode(s.instanceID, event.CallID, event.Data)
